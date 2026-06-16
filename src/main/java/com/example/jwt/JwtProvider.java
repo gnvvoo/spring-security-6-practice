@@ -17,7 +17,7 @@ import java.util.List;
 
 @Component
 public class JwtProvider {
-    private final SecretKey SECRET_KEY = Keys.hmacShaKeyFor("spring-security-6".getBytes(StandardCharsets.UTF_8));
+    private final SecretKey SECRET_KEY = Keys.hmacShaKeyFor("spring-security-6-practice-very-tired4546465464".getBytes(StandardCharsets.UTF_8));
     private final long EXPIRATION_TIME = 1000L * 60 * 60;
 
     public String generateToken(String email) {
