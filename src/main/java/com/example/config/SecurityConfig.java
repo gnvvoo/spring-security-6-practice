@@ -23,9 +23,10 @@ public class SecurityConfig {
         http
                 // 요청에 대한 권한 부여 규칙을 정의
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/api/auth/**").permitAll() // /api/auth/** 경로는 수락
+                        .requestMatchers("/api/auth/**", "/h2-console/**").permitAll()
                         .anyRequest().authenticated() // 그 외 모든 요청은 인증 필요
                 )
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .csrf(csrf -> csrf.disable()) // csrf는 disable
                 // sessionManagement
                 .sessionManagement(session -> session
