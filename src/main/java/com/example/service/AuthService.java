@@ -1,17 +1,22 @@
 package com.example.service;
 
+import com.example.dto.LoginRequest;
 import com.example.dto.SignupRequest;
 import com.example.entity.User;
+import com.example.jwt.JwtProvider;
 import com.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
 
     public void signup(SignupRequest request) {
         // 1. 이메일 중복 체크
@@ -30,5 +35,21 @@ public class AuthService {
                 .build();
         // 4. 저장
         userRepository.save(user);
+    }
+
+    public String login(LoginRequest request) {
+        Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
+
+        if (userOptional.isEmpty()) {
+            throw new IllegalArgumentException("없는 이메일입니다.");
+        }
+
+        User user = userOptional.get();
+
+        if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            return jwtProvider.generateToken(user.getEmail());
+        } else {
+            throw new IllegalArgumentException("비밀번호가 틀립니다.");
+        }
     }
 }
