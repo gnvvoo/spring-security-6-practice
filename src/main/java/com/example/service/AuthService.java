@@ -2,6 +2,7 @@ package com.example.service;
 
 import com.example.dto.LoginRequest;
 import com.example.dto.SignupRequest;
+import com.example.dto.TokenResponse;
 import com.example.entity.User;
 import com.example.jwt.JwtProvider;
 import com.example.repository.UserRepository;
@@ -15,8 +16,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
+
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final RefreshTokenService refreshTokenService;
 
     public void signup(SignupRequest request) {
         // 1. 이메일 중복 체크
@@ -37,7 +40,7 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    public String login(LoginRequest request) {
+    public TokenResponse login(LoginRequest request) {
         Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
 
         if (userOptional.isEmpty()) {
@@ -46,10 +49,18 @@ public class AuthService {
 
         User user = userOptional.get();
 
-        if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            return jwtProvider.generateToken(user.getEmail());
-        } else {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 틀립니다.");
         }
+
+        String accessToken = jwtProvider.generateToken(user.getEmail());
+        String refreshToken = jwtProvider.generateRefreshToken(user.getEmail());
+
+        refreshTokenService.save(user.getEmail(), refreshToken);
+
+        return TokenResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 }

@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.dto.LoginRequest;
 import com.example.dto.SignupRequest;
+import com.example.dto.TokenResponse;
 import com.example.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
-            String token = authService.login(request);
+            TokenResponse token = authService.login(request);
             return ResponseEntity.ok(token);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(401).body(e.getMessage());

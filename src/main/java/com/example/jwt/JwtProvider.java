@@ -19,10 +19,23 @@ import java.util.List;
 public class JwtProvider {
     private final SecretKey SECRET_KEY = Keys.hmacShaKeyFor("spring-security-6-practice-very-tired4546465464".getBytes(StandardCharsets.UTF_8));
     private final long EXPIRATION_TIME = 1000L * 60 * 60;
+    private final long REFRESH_EXPIRATION_TIME = 14 * 24 * 60 * 60 * 1000L;
 
     public String generateToken(String email) {
         Date now = new Date();
         Date exp = new Date(now.getTime() + EXPIRATION_TIME);
+
+        return Jwts.builder()
+                .subject(email)
+                .issuedAt(now)
+                .expiration(exp)
+                .signWith(SECRET_KEY)
+                .compact();
+    }
+
+    public String generateRefreshToken(String email) {
+        Date now = new Date();
+        Date exp = new Date(now.getTime() + REFRESH_EXPIRATION_TIME);
 
         return Jwts.builder()
                 .subject(email)
