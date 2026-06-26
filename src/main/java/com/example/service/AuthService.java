@@ -64,6 +64,13 @@ public class AuthService {
                 .build();
     }
 
+    public void logout(String email) {
+        if (refreshTokenService.find(email) == null)
+            throw new IllegalArgumentException("유효하지 않은 요청입니다");
+
+        refreshTokenService.delete(email);
+    }
+
     public String reissue(String refreshToken) {
         if (!jwtProvider.validateToken(refreshToken)) {
             throw new IllegalArgumentException("유효하지 않은 토큰입니다!");
