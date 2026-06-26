@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import com.example.dto.LoginRequest;
+import com.example.dto.ReissueRequest;
 import com.example.dto.SignupRequest;
 import com.example.dto.TokenResponse;
 import com.example.service.AuthService;
@@ -34,6 +35,16 @@ public class AuthController {
         try {
             TokenResponse token = authService.login(request);
             return ResponseEntity.ok(token);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(401).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/reissue")
+    public ResponseEntity<?> reissue(@RequestBody ReissueRequest request) {
+        try {
+            String accessToken = authService.reissue(request.getRefreshToken());
+            return ResponseEntity.ok(accessToken);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(401).body(e.getMessage());
         }
