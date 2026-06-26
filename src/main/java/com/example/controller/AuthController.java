@@ -57,8 +57,8 @@ public class AuthController {
     @PostMapping("/reissue")
     public ResponseEntity<?> reissue(@RequestBody ReissueRequest request) {
         try {
-            String accessToken = authService.reissue(request.getRefreshToken());
-            return ResponseEntity.ok(accessToken);
+            TokenResponse tokenResponse = authService.reissue(request.getRefreshToken());
+            return ResponseEntity.ok(tokenResponse);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(401).body(e.getMessage());
         }

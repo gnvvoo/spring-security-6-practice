@@ -71,7 +71,7 @@ public class AuthService {
         refreshTokenService.delete(email);
     }
 
-    public String reissue(String refreshToken) {
+    public TokenResponse reissue(String refreshToken) {
         if (!jwtProvider.validateToken(refreshToken)) {
             throw new IllegalArgumentException("유효하지 않은 토큰입니다!");
         }
@@ -82,6 +82,14 @@ public class AuthService {
             throw new IllegalArgumentException("유효하지 않은 토큰입니다!");
         }
 
-        return jwtProvider.generateToken(email);
+        String newAccessToken = jwtProvider.generateToken(email);
+        String newRefreshToken = jwtProvider.generateRefreshToken(email);
+
+        refreshTokenService.save(email, newRefreshToken);
+
+        return TokenResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .build();
     }
 }
